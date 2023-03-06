@@ -8,7 +8,6 @@
 
 namespace App\Validation;
 
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
@@ -86,7 +85,8 @@ class TaskValidation
     public function initMessages()
     {
         $this->messages = [
-            'start_conclusion_date' => 'conclusion_date must be greater than start_date'
+            'start_conclusion_date' => 'conclusion_date must be greater or equal than start_date',
+            'start_conclusion_date_parse' => 'could not parse start or conclusion date'
         ];
     }
 
@@ -110,7 +110,7 @@ class TaskValidation
             }
         }
 
-        $this->assertConclusionGreaterThanStartDate($request);
+        $this->assertConclusionGreaterEqualStartDate($model);
 
         if (count($this->errors)) {
             return false;
@@ -132,23 +132,15 @@ class TaskValidation
         $this->errors[$rule] = $messages;
     }
 
-    public function assertConclusionGreaterThanStartDate(Request $request)
+    public function assertConclusionGreaterEqualStartDate(Model $model)
     {
 
-        try {
-            $startDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'));
+        try{
+            if (!$model->conclusion_date->gte($model->start_date)) {
+                $this->errors['start_conclusion_date'][] = $this->messages['start_conclusion_date'];
+            }
         } catch(\Exception $e) {
-            return;
-        }
-
-        try {
-            $conclusionDate = Carbon::createFromFormat('Y-m-d', $request->input('conclusion_date'));
-        } catch(\Exception $e) {
-            return;
-        }
-
-        if (!$conclusionDate->gt($startDate)) {
-            $this->errors['start_conclusion_date'][] = $this->messages['start_conclusion_date'];
+            $this->errors['start_conclusion_date'][] = $this->messages['start_conclusion_date_parse'];
         }
     }
 
