@@ -8,6 +8,7 @@
 
 namespace App\Validation;
 
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
@@ -72,9 +73,9 @@ class TaskValidation
     public function initRules()
     {
         $this->rules['title'] = v::length(1, 200)->setName('title');
-        $this->rules['description'] = v::optional(v::length(1, 5000))->setName('descrição');
-        $this->rules['start_date'] = v::date('Y-m-d')->setName('data de ínicio');
-        $this->rules['conclusion_date'] = v::date('Y-m-d')->setName('data de conclusão');
+        $this->rules['description'] = v::optional(v::length(1, 5000))->setName('description');
+        $this->rules['start_date'] = v::date('Y-m-d')->setName('start_date');
+        $this->rules['conclusion_date'] = v::date('Y-m-d')->setName('conclusion_date');
     }
 
     /**
@@ -85,6 +86,7 @@ class TaskValidation
     public function initMessages()
     {
         $this->messages = [
+            'start_conclusion_date' => 'conclusion_date must be greater than start_date'
         ];
     }
 
@@ -108,9 +110,7 @@ class TaskValidation
             }
         }
 
-        if ($this->action == 'create') {
-            $this->assertUniqueId($model);
-        }
+        $this->assertConclusionGreaterThanStartDate($request);
 
         if (count($this->errors)) {
             return false;
@@ -132,17 +132,23 @@ class TaskValidation
         $this->errors[$rule] = $messages;
     }
 
-    public function assertUniqueId(Model $model)
+    public function assertConclusionGreaterThanStartDate(Request $request)
     {
-        $query = $model->newQuery();
 
-        $records = $query->where([
-            ['id', '=', $model->id]
+        try {
+            $startDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'));
+        } catch(\Exception $e) {
+            return;
+        }
 
-        ])->count();
+        try {
+            $conclusionDate = Carbon::createFromFormat('Y-m-d', $request->input('conclusion_date'));
+        } catch(\Exception $e) {
+            return;
+        }
 
-        if ($records) {
-            $this->errors['id'][] = $this->messages['unique_id'];
+        if (!$conclusionDate->gt($startDate)) {
+            $this->errors['start_conclusion_date'][] = $this->messages['start_conclusion_date'];
         }
     }
 
