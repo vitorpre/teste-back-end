@@ -9,7 +9,9 @@
 namespace App\Models;
 
 
-class Task
+use Illuminate\Database\Eloquent\Model;
+
+class Task extends Model
 {
     protected $fillable = [
         'title',
@@ -21,5 +23,7 @@ class Task
     protected $casts = [
         'start_date' => 'datetime:Y-m-d',
         'conclusion_date' => 'datetime:Y-m-d',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 }
