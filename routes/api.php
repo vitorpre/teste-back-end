@@ -30,8 +30,13 @@ Route::group([
 
 });
 
-Route::get('/tasks', [TaskController::class, 'index'])->name('api/tasks/index');
-Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('api/tasks/show');
-Route::post('/tasks', [TaskController::class, 'store'])->name('api/tasks/store');
-Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('api/tasks/update');
-Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('api/tasks/destroy');
+Route::group([
+    'middleware' => 'jwt.auth',
+], function ($router) {
+    Route::get('/tasks', [TaskController::class, 'index'])->name('api/tasks/index');
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('api/tasks/show');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('api/tasks/store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('api/tasks/update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('api/tasks/destroy');
+});
+
