@@ -137,8 +137,8 @@ Após a execução, o servidor nginx estará rodando na porta 80 e o banco de da
   
   | Endpoint | Método | Parâmetros | Resposta | 
    | --- | --- | --- | --- |
-   | `/api/tasks` | GET | N/A | Todas as tarefas |
-   | `/api/tasks/[id]` | id | N/A | Tarefa especifica | 
+   | `/api/tasks` | GET | N/A | Todas as tarefas paginadas |
+   | `/api/tasks/[id]` | GET | id | Tarefa especifica | 
    | `/api/tasks` | POST | Título, descrição, data inicial, data de conclusão | Tarefa inserida |
    | `/api/tasks/[id]` | PUT | id | Tarefa atualizada |
    | `/api/tasks/[id]` | DELETE | id | Confirmação de exclusão |
@@ -158,26 +158,65 @@ Após a execução, o servidor nginx estará rodando na porta 80 e o banco de da
   Retorno:
   
   ```
-  [
-      {
-          "id": 1,
-          "title": "Teste 1",
-          "description": "descrição da tarefa",
-          "start_date": "2025-01-01",
-          "conclusion_date": "2025-01-05",
-          "created_at": "2023-03-06 17:48:03",
-          "updated_at": "2023-03-06 18:19:14"
-      },
-      {
-          "id": 2,
-          "title": "Teste 2",
-          "description": "descrição da tarefa",
-          "start_date": "2025-01-01",
-          "conclusion_date": "2025-01-03",
-          "created_at": "2023-03-06 18:22:55",
-          "updated_at": "2023-03-06 18:22:55"
-      }
-  ]
+  {
+      "current_page": 1,
+      "data": [
+          {
+              "id": 1,
+              "title": "Teste",
+              "description": "descrição de tarefa",
+              "start_date": "2025-01-01",
+              "conclusion_date": "2025-01-03",
+              "created_at": "2023-03-06 17:48:03",
+              "updated_at": "2023-03-06 18:19:14"
+          },
+          {
+              "id": 2,
+              "title": "Teste",
+              "description": "descrição de tarefa",
+              "start_date": "2025-01-01",
+              "conclusion_date": "2025-01-01",
+              "created_at": "2023-03-06 18:22:55",
+              "updated_at": "2023-03-06 18:22:55"
+          },
+          {
+              "id": 4,
+              "title": "Teste",
+              "description": "descrição de tarefa",
+              "start_date": "2025-01-02",
+              "conclusion_date": "2025-01-05",
+              "created_at": "2023-03-06 18:23:53",
+              "updated_at": "2023-03-06 18:23:53"
+          }
+      ],
+      "first_page_url": "http://.../api/tasks?page=1",
+      "from": 1,
+      "last_page": 1,
+      "last_page_url": "http://.../api/tasks?page=1",
+      "links": [
+          {
+              "url": null,
+              "label": "&laquo; Previous",
+              "active": false
+          },
+          {
+              "url": "http://.../api/tasks?page=1",
+              "label": "1",
+              "active": true
+          },
+          {
+              "url": null,
+              "label": "Next &raquo;",
+              "active": false
+          }
+      ],
+      "next_page_url": null,
+      "path": "http://.../api/tasks",
+      "per_page": 100,
+      "prev_page_url": null,
+      "to": 3,
+      "total": 3
+  }
   ```
   
   `GET /api/tasks/[id]`
